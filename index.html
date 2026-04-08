@@ -364,7 +364,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Outfit
   <div class="sec"><div class="sec-eyebrow">Questions à poser avant de signer</div><div class="q-list" id="qOut"></div></div>
   <div class="res-cta">
     <button class="btn-outline" onclick="go('screen-home')">Analyser un autre contrat</button>
-    <div class="watermark">Rapport généré par <a href="#">clausewatch.ca</a> · Information uniquement</div>
+    <div class="watermark">Rapport généré par <a href="#">clausewatch-pwa.vercel.app</a> · Information uniquement</div>
   </div>
 </div>
 
@@ -468,7 +468,7 @@ function render(d){
   go('screen-result');
 }
 
-function doShare(){if(navigator.share){navigator.share({title:'Rapport ClauseWatch',text:"J'ai analysé ce contrat avec ClauseWatch.",url:'https://clausewatch.ca'});}else{navigator.clipboard.writeText('https://clausewatch.ca').then(()=>toast('Lien copié !'));}}
+function doShare(){if(navigator.share){navigator.share({title:'Rapport ClauseWatch',text:"J'ai analysé ce contrat avec ClauseWatch.",url:'https://clausewatch-pwa.vercel.app'});}else{navigator.clipboard.writeText('https://clausewatch-pwa.vercel.app').then(()=>toast('Lien copié !'));}}
 </script>
 </body>
 </html>
