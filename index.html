@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0A0908">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="ClauseWatch">
+<link rel="manifest" href="manifest.json">
+<title>ClauseWatch</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0A0908;--bg2:#111009;--surface:#1A1815;--surface2:#242018;
+  --border:#2E2A24;--border2:#3D382F;
+  --gold:#D4A853;--gold2:#E8C070;--gold-dim:#6B5429;--gold-glow:rgba(212,168,83,0.12);
+  --text:#F2EDE4;--text2:#A89E8C;--text3:#655D50;
+  --red:#E05540;--red-bg:rgba(224,85,64,0.1);
+  --amber:#D4883A;--amber-bg:rgba(212,136,58,0.1);
+  --purple:#8B7FD4;--purple-bg:rgba(139,127,212,0.1);
+  --green:#4CAF7D;--green-bg:rgba(76,175,125,0.1);
+  --r:14px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overflow-x:hidden;}
+.screen{display:none;min-height:100vh;flex-direction:column;position:relative;z-index:1;}
+.screen.active{display:flex;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes scanline{0%{top:-4px}100%{top:100%}}
+@keyframes shimmer{0%{left:-100%}100%{left:200%}}
+
+.a1{animation:fadeUp .5s ease both}
+.a2{animation:fadeUp .5s .08s ease both}
+.a3{animation:fadeUp .5s .16s ease both}
+.a4{animation:fadeUp .5s .24s ease both}
+.a5{animation:fadeUp .5s .32s ease both}
+
+/* HOME */
+#screen-home{background:var(--bg);}
+.bg-radial{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(212,168,83,0.1) 0%,transparent 65%);pointer-events:none;}
+
+.hdr{padding:52px 22px 0;display:flex;justify-content:space-between;align-items:flex-start;position:relative;}
+.logo{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;letter-spacing:-.3px;}
+.logo-gold{color:var(--gold);}
+.logo-sub{font-size:9px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;margin-top:3px;}
+.price-badge{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0A0908;font-size:12px;font-weight:700;padding:7px 16px;border-radius:99px;}
+
+.hero{padding:40px 22px 0;position:relative;}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border2);border-radius:99px;padding:6px 14px;margin-bottom:22px;}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite;}
+.hero-pill-txt{font-size:10px;color:var(--text2);letter-spacing:.07em;text-transform:uppercase;}
+.hero-h1{font-family:'Playfair Display',serif;font-size:clamp(36px,9vw,50px);line-height:1.06;letter-spacing:-.5px;margin-bottom:18px;}
+.hero-h1 i{color:var(--gold);font-style:italic;}
+.hero-p{font-size:15px;color:var(--text2);line-height:1.7;font-weight:300;margin-bottom:34px;max-width:320px;}
+
+.ctas{padding:0 22px;display:flex;flex-direction:column;gap:11px;}
+.btn-g{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0A0908;border:none;padding:17px 22px;border-radius:var(--r);font-size:15px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 28px rgba(212,168,83,0.28);position:relative;overflow:hidden;transition:transform .12s;}
+.btn-g:active{transform:scale(.97);}
+.btn-g svg{width:18px;height:18px;fill:#0A0908;flex-shrink:0;}
+.btn-o{width:100%;background:var(--surface);color:var(--text);border:1px solid var(--border2);padding:17px 22px;border-radius:var(--r);font-size:15px;font-weight:400;font-family:'Outfit',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .12s;}
+.btn-o:active{background:var(--surface2);}
+.btn-o svg{width:18px;height:18px;fill:var(--text2);flex-shrink:0;}
+
+.trust{margin:28px 22px 0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.trust-item{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--border);}
+.trust-item:last-child{border-bottom:none;}
+.trust-ico{width:34px;height:34px;border-radius:9px;background:var(--gold-glow);border:1px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.trust-ico svg{width:15px;height:15px;fill:var(--gold);}
+.trust-txt{font-size:13px;color:var(--text2);line-height:1.4;}
+.trust-txt b{color:var(--text);font-weight:500;}
+.foot{padding:22px 22px 40px;text-align:center;font-size:11px;color:var(--text3);line-height:1.7;margin-top:auto;}
+
+/* CAMERA */
+#screen-camera{background:#000;}
+#videoEl{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.cam-ui{position:absolute;inset:0;display:flex;flex-direction:column;}
+.cam-top{position:absolute;top:0;left:0;right:0;padding:52px 20px 20px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent);z-index:5;}
+.cam-x{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.cam-lbl{color:#fff;font-size:13px;font-weight:500;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);padding:7px 16px;border-radius:99px;border:1px solid rgba(255,255,255,.15);}
+.cam-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+.cam-rect{width:80%;max-width:310px;aspect-ratio:3/4;position:relative;}
+.cam-rect::before{content:'';position:absolute;top:0;left:0;width:22px;height:22px;border-top:2px solid var(--gold);border-left:2px solid var(--gold);}
+.cam-rect::after{content:'';position:absolute;top:0;right:0;width:22px;height:22px;border-top:2px solid var(--gold);border-right:2px solid var(--gold);}
+.cam-rect .bl{position:absolute;bottom:0;left:0;width:22px;height:22px;border-bottom:2px solid var(--gold);border-left:2px solid var(--gold);}
+.cam-rect .br{position:absolute;bottom:0;right:0;width:22px;height:22px;border-bottom:2px solid var(--gold);border-right:2px solid var(--gold);}
+.cam-scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:scanline 2.2s linear infinite;opacity:.7;}
+.cam-hint-txt{color:rgba(255,255,255,.65);font-size:13px;margin-top:18px;text-align:center;padding:0 40px;line-height:1.5;font-weight:300;}
+.cam-bot{position:absolute;bottom:0;left:0;right:0;padding:20px 40px 48px;background:linear-gradient(to top,rgba(0,0,0,.75),transparent);display:flex;align-items:center;justify-content:center;}
+.shutter{width:74px;height:74px;border-radius:50%;border:3px solid rgba(255,255,255,.45);background:#fff;cursor:pointer;transition:transform .1s;display:flex;align-items:center;justify-content:center;}
+.shutter:active{transform:scale(.88);}
+.sh-inner{width:58px;height:58px;border-radius:50%;background:#fff;}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .08s;}
+.flash.on{opacity:.85;}
+#camCanvas{display:none;}
+
+/* NAV BAR */
+.nav{padding:52px 20px 16px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border);}
+.nav-bk{width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-ttl{font-size:16px;font-weight:500;}
+
+/* PREVIEW */
+.prev-img{margin:18px 20px 0;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;max-height:40vh;}
+#prevImg{width:100%;object-fit:contain;max-height:40vh;display:block;}
+.form-box{padding:18px 20px 0;}
+.lbl{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:8px;}
+.sel,.inp{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:11px;padding:14px 16px;font-size:14px;font-family:'Outfit',sans-serif;color:var(--text);outline:none;transition:border .15s;-webkit-appearance:none;appearance:none;margin-bottom:16px;}
+.sel{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23655D50' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer;}
+.sel:focus,.inp:focus{border-color:var(--gold-dim);}
+.inp::placeholder{color:var(--text3);}
+.sel option{background:var(--bg);}
+.cta-box{padding:4px 20px 40px;}
+.price-note{text-align:center;font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6;}
+.price-note b{color:var(--text2);}
+
+/* LOADING */
+#screen-loading{background:var(--bg);align-items:center;justify-content:center;text-align:center;}
+.ld-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(212,168,83,0.07) 0%,transparent 70%);pointer-events:none;}
+.ld-inner{padding:40px 32px;position:relative;z-index:1;}
+.ld-logo{font-family:'Playfair Display',serif;font-size:28px;color:var(--text);margin-bottom:48px;}
+.ld-logo span{color:var(--gold);}
+.ld-spin-wrap{position:relative;width:80px;height:80px;margin:0 auto 32px;}
+.ld-track{position:absolute;inset:0;border-radius:50%;border:2px solid var(--border);}
+.ld-arc{position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:var(--gold);animation:spin 1.1s cubic-bezier(.5,0,.5,1) infinite;}
+.ld-arc2{position:absolute;inset:9px;border-radius:50%;border:2px solid transparent;border-bottom-color:var(--gold-dim);animation:spin 1.7s cubic-bezier(.5,0,.5,1) infinite reverse;}
+.ld-dot{position:absolute;top:50%;left:50%;width:8px;height:8px;border-radius:50%;background:var(--gold);transform:translate(-50%,-50%);animation:pulse 1.1s infinite;}
+.ld-step{font-size:14px;color:var(--text2);margin-bottom:6px;min-height:22px;font-weight:300;transition:opacity .3s;}
+.ld-sub{font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;}
+.ld-bar-wrap{width:160px;height:2px;background:var(--border);border-radius:1px;margin:26px auto 0;overflow:hidden;}
+.ld-bar{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold),var(--gold2));border-radius:1px;width:0%;transition:width .9s ease;}
+
+/* RESULT */
+#screen-result{background:var(--bg);}
+.res-nav{padding:52px 20px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.res-nav-l{display:flex;align-items:center;gap:14px;}
+.share-btn{background:var(--surface);border:1px solid var(--border2);color:var(--text2);font-size:12px;font-family:'Outfit',sans-serif;padding:8px 14px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.share-btn svg{width:13px;height:13px;fill:var(--text2);}
+
+.score-card{margin:18px 20px 22px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;display:flex;gap:18px;align-items:center;position:relative;overflow:hidden;}
+.score-card::before{content:'';position:absolute;top:-50px;right:-50px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,var(--gold-glow) 0%,transparent 70%);pointer-events:none;}
+.dial-wrap{position:relative;width:78px;height:78px;flex-shrink:0;}
+.dial-wrap svg{width:78px;height:78px;transform:rotate(-90deg);}
+.dial-bg{fill:none;stroke:var(--border);stroke-width:5;}
+.dial-fill{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.34,1.56,.64,1);}
+.dial-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.dial-n{font-family:'Playfair Display',serif;font-size:24px;line-height:1;}
+.dial-d{font-size:9px;color:var(--text3);margin-top:1px;}
+.score-txt{}
+.s-verdict{font-size:16px;font-weight:600;margin-bottom:5px;line-height:1.3;}
+.s-sub{font-size:12px;color:var(--text2);line-height:1.5;font-weight:300;}
+
+.sec{padding:0 20px;margin-bottom:22px;}
+.sec-eyebrow{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sec-eyebrow::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.al{border-radius:12px;padding:15px;margin-bottom:10px;border:1px solid;}
+.al.r{background:var(--red-bg);border-color:rgba(224,85,64,.3);}
+.al.o{background:var(--amber-bg);border-color:rgba(212,136,58,.3);}
+.al.y{background:var(--purple-bg);border-color:rgba(139,127,212,.3);}
+.al.g{background:var(--green-bg);border-color:rgba(76,175,125,.3);}
+.al-badge{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:99px;display:inline-block;margin-bottom:8px;}
+.al.r .al-badge{background:rgba(224,85,64,.2);color:var(--red);}
+.al.o .al-badge{background:rgba(212,136,58,.2);color:var(--amber);}
+.al.y .al-badge{background:rgba(139,127,212,.2);color:var(--purple);}
+.al.g .al-badge{background:rgba(76,175,125,.2);color:var(--green);}
+.al-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px;}
+.al-desc{font-size:12px;color:var(--text2);line-height:1.55;font-weight:300;}
+.al-ref{font-size:10px;color:var(--text3);margin-top:5px;font-style:italic;}
+
+.summary-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:17px;}
+.summary-box p{font-size:13px;color:var(--text2);line-height:1.75;font-weight:300;}
+
+.q-list{display:flex;flex-direction:column;}
+.q-item{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);}
+.q-item:last-child{border-bottom:none;}
+.q-n{width:22px;height:22px;border-radius:6px;background:var(--gold-glow);border:1px solid var(--gold-dim);font-size:10px;font-weight:700;color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.q-t{font-size:13px;color:var(--text2);line-height:1.5;font-weight:300;}
+
+.res-cta{padding:18px 20px 48px;}
+.btn-outline{width:100%;background:transparent;border:1px solid var(--gold-dim);color:var(--gold);padding:15px;border-radius:var(--r);font-size:15px;font-weight:500;font-family:'Outfit',sans-serif;cursor:pointer;transition:background .15s;}
+.btn-outline:active{background:var(--gold-glow);}
+.watermark{text-align:center;font-size:10px;color:var(--text3);margin-top:12px;line-height:1.7;}
+.watermark a{color:var(--gold-dim);text-decoration:none;}
+
+/* UPLOAD */
+#screen-upload{background:var(--bg);}
+.up-drop{margin:18px 20px;border:2px dashed var(--border2);border-radius:14px;padding:38px 22px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
+.up-drop:active{border-color:var(--gold-dim);background:var(--gold-glow);}
+.up-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.up-ico{width:52px;height:52px;border-radius:13px;background:var(--surface);border:1px solid var(--border);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;}
+.up-ico svg{width:24px;height:24px;fill:var(--text3);}
+.up-txt{font-size:15px;color:var(--text2);margin-bottom:4px;}
+.up-sub{font-size:12px;color:var(--text3);}
+.file-chip{display:none;margin:0 20px 16px;background:var(--surface);border:1px solid var(--gold-dim);border-radius:11px;padding:12px 16px;align-items:center;gap:12px;}
+.file-chip.on{display:flex;}
+.fc-ico{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.fc-ico svg{width:16px;height:16px;fill:#0A0908;}
+.fc-name{flex:1;font-size:13px;color:var(--gold);font-weight:500;word-break:break-all;}
+.fc-rm{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:0;line-height:1;}
+
+/* TOAST */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--surface);color:var(--text);border:1px solid var(--border2);font-size:13px;padding:11px 20px;border-radius:99px;opacity:0;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:500;align-items:flex-end;}
+.modal-bg.on{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:28px 22px 48px;width:100%;}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border2);margin:0 auto 22px;}
+.modal-h{font-family:'Playfair Display',serif;font-size:22px;color:var(--text);margin-bottom:8px;}
+.modal-p{font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.6;font-weight:300;}
+.modal-lbl{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:8px;}
+.modal-inp{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:11px;padding:14px 16px;font-size:14px;font-family:'Outfit',sans-serif;color:var(--text);outline:none;margin-bottom:8px;transition:border .15s;}
+.modal-inp:focus{border-color:var(--gold-dim);}
+.modal-hint{font-size:11px;color:var(--text3);margin-bottom:22px;line-height:1.6;}
+.modal-hint a{color:var(--gold-dim);}
+.modal-btn{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0A0908;border:none;padding:16px;border-radius:var(--r);font-size:15px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-bg" id="mApi">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-h">Clé API OpenAI</div>
+    <div class="modal-p">Stockée uniquement sur ton appareil. Jamais transmise à nos serveurs.</div>
+    <label class="modal-lbl">Ta clé API</label>
+    <input class="modal-inp" type="password" id="apiInp" placeholder="sk-proj-..." autocomplete="off" spellcheck="false">
+    <div class="modal-hint">Sur <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a> — commence par <b style="color:var(--text2)">sk-</b></div>
+    <button class="modal-btn" onclick="saveKey()">Enregistrer et continuer</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="bg-radial"></div>
+  <div class="hdr a1">
+    <div><div class="logo">Clause<span class="logo-gold">.</span>Watch</div><div class="logo-sub">Analyse de contrat · Canada</div></div>
+    <div class="price-badge">1,99 $</div>
+  </div>
+  <div class="hero">
+    <div class="hero-pill a2"><div class="hero-dot"></div><div class="hero-pill-txt">Clauses non conventionnelles · IA</div></div>
+    <h1 class="hero-h1 a3">En quelques secondes,<br><i>on vérifie les<br>clauses pour toi.</i></h1>
+    <p class="hero-p a4">On détecte les pièges cachés, les clauses suspectes et tout ce qui ne devrait pas être là. En 60 secondes.</p>
+  </div>
+  <div class="ctas a4">
+    <button class="btn-g" onclick="startCam()">
+      <svg viewBox="0 0 24 24"><path d="M12 15.2A3.2 3.2 0 1 1 12 8.8a3.2 3.2 0 0 1 0 6.4zm0-1.6a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2zM9 3l-1.83 2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3H9z"/></svg>
+      Photographier le contrat
+    </button>
+    <button class="btn-o" onclick="goUp()">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+      Uploader un PDF
+    </button>
+  </div>
+  <div class="trust a5">
+    <div class="trust-item">
+      <div class="trust-ico"><svg viewBox="0 0 24 24"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm-1 13l-3-3 1.41-1.41L11 12.17l4.59-4.58L17 9l-6 6z"/></svg></div>
+      <div class="trust-txt"><b>Droit canadien</b> — Loi sur la protection du consommateur &amp; Loi 25 Québec</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-ico"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
+      <div class="trust-txt"><b>Aucun abonnement</b> — 1,99 $ seulement quand tu en as besoin</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-ico"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div>
+      <div class="trust-txt"><b>Privé par défaut</b> — Ta clé API reste uniquement sur ton appareil</div>
+    </div>
+  </div>
+  <div class="foot">ClauseWatch fournit de l'information, pas des conseils juridiques.<br>Consultez un avocat pour tout litige important.</div>
+</div>
+
+<!-- CAMERA -->
+<div class="screen" id="screen-camera">
+  <video id="videoEl" autoplay playsinline muted></video>
+  <div class="cam-ui">
+    <div class="cam-top">
+      <button class="cam-x" onclick="stopCam()">✕</button>
+      <div class="cam-lbl">Photographier le contrat</div>
+      <div style="width:40px"></div>
+    </div>
+    <div class="cam-mid">
+      <div class="cam-rect">
+        <div class="bl"></div><div class="br"></div>
+        <div class="cam-scan"></div>
+      </div>
+      <div class="cam-hint-txt">Centre le contrat dans le cadre.<br>Le texte doit être bien lisible.</div>
+    </div>
+    <div class="flash" id="flash"></div>
+    <div class="cam-bot">
+      <button class="shutter" onclick="snap()"><div class="sh-inner"></div></button>
+    </div>
+  </div>
+  <canvas id="camCanvas" style="display:none"></canvas>
+</div>
+
+<!-- PREVIEW -->
+<div class="screen" id="screen-preview">
+  <div class="nav"><button class="nav-bk" onclick="go('screen-home')">←</button><div class="nav-ttl">Vérifier avant d'analyser</div></div>
+  <div class="prev-img"><img id="prevImg" src="" alt=""></div>
+  <div class="form-box">
+    <label class="lbl">Type de contrat</label>
+    <select class="sel" id="cType">
+      <option value="general">Contrat général</option>
+      <option value="bail">Bail / location</option>
+      <option value="emploi">Contrat d'emploi</option>
+      <option value="telecom">Abonnement télécom / internet</option>
+      <option value="freelance">Contrat freelance / service</option>
+      <option value="assurance">Assurance</option>
+      <option value="gym">Abonnement gym / sport</option>
+      <option value="streaming">Abonnement streaming / SaaS</option>
+      <option value="pret">Contrat de prêt</option>
+    </select>
+    <label class="lbl">Email (rapport PDF)</label>
+    <input class="inp" type="email" id="cEmail" placeholder="ton@email.com">
+  </div>
+  <div class="cta-box">
+    <button class="btn-g" onclick="analyze()">
+      <svg viewBox="0 0 24 24" style="fill:#0A0908"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+      Analyser — 1,99 $
+    </button>
+    <div class="price-note">Paiement sécurisé · Aucun abonnement · <b>Résultat en 60 sec</b></div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="screen" id="screen-loading">
+  <div class="ld-glow"></div>
+  <div class="ld-inner">
+    <div class="ld-logo">Clause<span>.</span>Watch</div>
+    <div class="ld-spin-wrap">
+      <div class="ld-track"></div><div class="ld-arc"></div>
+      <div class="ld-arc2"></div><div class="ld-dot"></div>
+    </div>
+    <div class="ld-step" id="ldStep">Lecture du contrat...</div>
+    <div class="ld-sub">Analyse par intelligence artificielle</div>
+    <div class="ld-bar-wrap"><div class="ld-bar" id="ldBar"></div></div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="screen-result">
+  <div class="res-nav">
+    <div class="res-nav-l"><button class="nav-bk" onclick="go('screen-home')">←</button><div class="nav-ttl">Rapport d'analyse</div></div>
+    <button class="share-btn" onclick="doShare()"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11A2.99 2.99 0 0 0 18 8a3 3 0 1 0-3-3c0 .24.04.47.09.7L8.04 9.81A2.99 2.99 0 0 0 6 9a3 3 0 0 0 0 6c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66A2.92 2.92 0 0 0 18 22a3 3 0 1 0 0-6z"/></svg>Partager</button>
+  </div>
+  <div class="score-card a1">
+    <div class="dial-wrap">
+      <svg viewBox="0 0 78 78"><circle class="dial-bg" cx="39" cy="39" r="33"/><circle class="dial-fill" id="dialFill" cx="39" cy="39" r="33" stroke-dasharray="207.3" stroke-dashoffset="207.3"/></svg>
+      <div class="dial-center"><div class="dial-n" id="dialN">—</div><div class="dial-d">/10</div></div>
+    </div>
+    <div class="score-txt">
+      <div class="s-verdict" id="sVerdict">—</div>
+      <div class="s-sub" id="sSub"></div>
+    </div>
+  </div>
+  <div class="sec"><div class="sec-eyebrow">Alertes détectées</div><div id="alertsOut"></div></div>
+  <div class="sec"><div class="sec-eyebrow">Résumé en clair</div><div class="summary-box"><p id="sumOut"></p></div></div>
+  <div class="sec"><div class="sec-eyebrow">Questions à poser avant de signer</div><div class="q-list" id="qOut"></div></div>
+  <div class="res-cta">
+    <button class="btn-outline" onclick="go('screen-home')">Analyser un autre contrat</button>
+    <div class="watermark">Rapport généré par <a href="#">clausewatch.ca</a> · Information uniquement</div>
+  </div>
+</div>
+
+<!-- UPLOAD -->
+<div class="screen" id="screen-upload">
+  <div class="nav"><button class="nav-bk" onclick="go('screen-home')">←</button><div class="nav-ttl">Uploader un PDF</div></div>
+  <div class="up-drop" onclick="document.getElementById('fInp').click()">
+    <input type="file" id="fInp" accept=".pdf,image/*" onchange="onFile(this)">
+    <div class="up-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h8v2H8zm0-4h8v2H8zm0-4h5v2H8z"/></svg></div>
+    <div class="up-txt">Appuie pour choisir</div>
+    <div class="up-sub">PDF, JPG ou PNG</div>
+  </div>
+  <div class="file-chip" id="fChip">
+    <div class="fc-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/></svg></div>
+    <div class="fc-name" id="fName">—</div>
+    <button class="fc-rm" onclick="clrFile()">×</button>
+  </div>
+  <div style="padding:0 20px">
+    <label class="lbl">Type de contrat</label>
+    <select class="sel" id="uType">
+      <option value="general">Contrat général</option>
+      <option value="bail">Bail / location</option>
+      <option value="emploi">Contrat d'emploi</option>
+      <option value="telecom">Abonnement télécom / internet</option>
+      <option value="freelance">Contrat freelance / service</option>
+      <option value="assurance">Assurance</option>
+      <option value="gym">Abonnement gym / sport</option>
+      <option value="streaming">Abonnement streaming / SaaS</option>
+      <option value="pret">Contrat de prêt</option>
+    </select>
+    <label class="lbl">Email (rapport PDF)</label>
+    <input class="inp" type="email" id="uEmail" placeholder="ton@email.com">
+  </div>
+  <div style="padding:8px 20px 48px">
+    <button class="btn-g" onclick="analyzeUp()">
+      <svg viewBox="0 0 24 24" style="fill:#0A0908"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+      Analyser — 1,99 $
+    </button>
+    <div class="price-note">Paiement sécurisé · Aucun abonnement</div>
+  </div>
+</div>
+
+<script>
+let ms=null,imgD=null,upD=null,apiKey=localStorage.getItem('cw_k')||'';
+
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function toast(m,d=2800){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),d);}
+
+function checkKey(cb){if(apiKey&&apiKey.startsWith('sk-')){cb();return;}document.getElementById('mApi').classList.add('on');window._cb=cb;}
+function saveKey(){const v=document.getElementById('apiInp').value.trim();if(!v.startsWith('sk-')){toast('Clé invalide — doit commencer par sk-');return;}apiKey=v;localStorage.setItem('cw_k',v);document.getElementById('mApi').classList.remove('on');if(window._cb){window._cb();window._cb=null;}}
+document.getElementById('mApi').addEventListener('click',function(e){if(e.target===this)this.classList.remove('on');});
+
+async function startCam(){checkKey(async()=>{go('screen-camera');try{ms=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}}});document.getElementById('videoEl').srcObject=ms;}catch(e){toast('Caméra non disponible');go('screen-home');}});}
+function stopCam(){if(ms){ms.getTracks().forEach(t=>t.stop());ms=null;}go('screen-home');}
+function snap(){const v=document.getElementById('videoEl'),c=document.getElementById('camCanvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);imgD=c.toDataURL('image/jpeg',.92);const f=document.getElementById('flash');f.classList.add('on');setTimeout(()=>f.classList.remove('on'),150);if(ms){ms.getTracks().forEach(t=>t.stop());ms=null;}document.getElementById('prevImg').src=imgD;go('screen-preview');}
+
+function goUp(){checkKey(()=>go('screen-upload'));}
+function onFile(i){const f=i.files[0];if(!f)return;document.getElementById('fName').textContent=f.name;document.getElementById('fChip').classList.add('on');const r=new FileReader();r.onload=e=>{upD=e.target.result;};r.readAsDataURL(f);}
+function clrFile(){upD=null;document.getElementById('fInp').value='';document.getElementById('fChip').classList.remove('on');}
+
+function analyze(){if(!imgD){toast('Aucune photo capturée');return;}runAI(imgD,document.getElementById('cType').value);}
+function analyzeUp(){if(!upD){toast('Choisis d\'abord un fichier');return;}runAI(upD,document.getElementById('uType').value);}
+
+async function runAI(img,ct){
+  go('screen-loading');
+  const steps=['Lecture du contrat...','Identification des clauses...','Analyse des termes suspects...','Comparaison aux standards canadiens...','Génération du rapport...'];
+  let si=0;const sv=document.getElementById('ldStep'),bv=document.getElementById('ldBar');
+  const iv=setInterval(()=>{if(si<steps.length){sv.textContent=steps[si];bv.style.width=((si+1)/steps.length*82)+'%';si++;}},2800);
+  const lb={general:'contrat général',bail:'bail de location',emploi:"contrat d'emploi",telecom:'abonnement télécom',freelance:'contrat de service',assurance:"contrat d'assurance",gym:'abonnement de gym',streaming:'abonnement SaaS',pret:'contrat de prêt'};
+  const sys=`Tu es un expert juridique canadien spécialisé dans la protection du consommateur (Ontario et Québec). Tu analyses des contrats pour des particuliers non-juristes. Identifie tout ce qui est non conventionnel, suspect, ou potentiellement abusif. Niveaux : ROUGE=clause potentiellement illégale ou clairement abusive, ORANGE=clause déséquilibrée, JAUNE=terme vague ou ambigu. Réponds UNIQUEMENT en JSON valide sans markdown : {"score":7,"verdict":"Verdict court","alertes":[{"niveau":"ROUGE","titre":"Titre","description":"Explication simple","clause":"Référence si visible"}],"resume":"Résumé 3-4 phrases en langage simple.","questions":["Question 1 ?","Question 2 ?"]}. Score 1-10. 3-7 alertes. 3-5 questions. Français canadien.`;
+  try{
+    const b64=img.split(',')[1],mime=img.split(';')[0].split(':')[1];
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-opus-4-6',max_tokens:2000,system:sys,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mime,data:b64}},{type:'text',text:`Analyse ce ${lb[ct]||'contrat'}. JSON uniquement.`}]}]})});
+    clearInterval(iv);bv.style.width='100%';
+    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Erreur API');}
+    const d=await res.json();
+    let r;try{r=JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());}catch{throw new Error('Réponse invalide — réessaie');}
+    setTimeout(()=>render(r),600);
+  }catch(e){clearInterval(iv);toast('Erreur : '+e.message,4000);go('screen-home');}
+}
+
+function render(d){
+  const s=Math.min(10,Math.max(1,d.score||5));
+  document.getElementById('dialN').textContent=s;
+  document.getElementById('sVerdict').textContent=d.verdict||'Analyse complète';
+  document.getElementById('sSub').textContent=s<=3?'Contrat très risqué — ne signez pas sans relire':s<=5?'Plusieurs points préoccupants à clarifier':s<=7?'Contrat acceptable avec quelques réserves':'Contrat globalement sain';
+  const f=document.getElementById('dialFill');
+  f.style.strokeDashoffset=207.3-(s/10)*207.3;
+  f.style.stroke=s<=3?'#E05540':s<=6?'#D4883A':'#4CAF7D';
+  const aw=document.getElementById('alertsOut');
+  aw.innerHTML='';
+  (d.alertes||[]).forEach(a=>{
+    const c=a.niveau==='ROUGE'?'r':a.niveau==='ORANGE'?'o':'y';
+    const l=a.niveau==='ROUGE'?'Alerte critique':a.niveau==='ORANGE'?'Point suspect':'Terme ambigu';
+    aw.innerHTML+=`<div class="al ${c}"><span class="al-badge">${l}</span><div class="al-title">${a.titre||''}</div><div class="al-desc">${a.description||''}</div>${a.clause?`<div class="al-ref">${a.clause}</div>`:''}</div>`;
+  });
+  if(!d.alertes?.length)aw.innerHTML='<div class="al g"><span class="al-badge">Aucune alerte</span><div class="al-title" style="margin-top:8px">Contrat conforme</div><div class="al-desc">Aucune clause suspecte détectée.</div></div>';
+  document.getElementById('sumOut').textContent=d.resume||'';
+  const qw=document.getElementById('qOut');qw.innerHTML='';
+  (d.questions||[]).forEach((q,i)=>{qw.innerHTML+=`<div class="q-item"><div class="q-n">${i+1}</div><div class="q-t">${q}</div></div>`;});
+  go('screen-result');
+}
+
+function doShare(){if(navigator.share){navigator.share({title:'Rapport ClauseWatch',text:"J'ai analysé ce contrat avec ClauseWatch.",url:'https://clausewatch.ca'});}else{navigator.clipboard.writeText('https://clausewatch.ca').then(()=>toast('Lien copié !'));}}
+</script>
+</body>
+</html>
